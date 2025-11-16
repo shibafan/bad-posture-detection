@@ -6,7 +6,7 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(model_complexity=1, enable_segmentation=False)
 draw = mp.solutions.drawing_utils
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 print(cap.isOpened())
 
 def extract_landmark_data(image):
@@ -51,6 +51,7 @@ def create_landmark_dataframe():
             f"lm{i}_z", 
             f"lm{i}_v"
         ])
+    
     df = pd.DataFrame(columns=cols)
     return df
 
@@ -88,4 +89,5 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 
-
+df.to_csv("bad3.csv", index=False)
+print("Saved bad3.csv")
