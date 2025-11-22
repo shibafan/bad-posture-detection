@@ -1,0 +1,4 @@
+train-venv/
+posture-env/
+__pycache__/
+*.pyc
