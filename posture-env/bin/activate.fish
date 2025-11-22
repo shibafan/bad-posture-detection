@@ -30,7 +30,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/aidanwu/Bad Posture Detection/posture-env"
+set -gx VIRTUAL_ENV "/Users/aidanwu/bad-posture-detection/posture-env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

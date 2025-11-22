@@ -65,23 +65,19 @@ _BERT_POSITIVE_RESULTS = TextClassifierResult(
             categories=[
                 _Category(
                     index=1,
-                    score=0.9994,
+                    score=0.9995,
                     display_name='',
-                    category_name='positive',
-                ),
+                    category_name='positive'),
                 _Category(
                     index=0,
-                    score=0.0006,
+                    score=0.0005,
                     display_name='',
-                    category_name='negative',
-                ),
+                    category_name='negative')
             ],
             head_index=0,
-            head_name='probability',
-        )
+            head_name='probability')
     ],
-    timestamp_ms=0,
-)
+    timestamp_ms=0)
 _REGEX_NEGATIVE_RESULTS = TextClassifierResult(
     classifications=[
         _Classifications(

@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import pandas as pd
+import numpy as np
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(model_complexity=1, enable_segmentation=False)
@@ -20,26 +21,27 @@ def extract_landmark_data(image):
 
     if not res.pose_landmarks:
         return None
-    
+
     lm = res.pose_landmarks.landmark
 
-    # normalize on hip center
-    L_HIP = 23
-    R_HIP = 24
-    hip_x = (lm[L_HIP].x + lm[R_HIP].x) / 2
-    hip_y = (lm[L_HIP].y + lm[R_HIP].y) / 2
-    hip_z = (lm[L_HIP].z + lm[R_HIP].z) / 2
+    # Shoulder landmarks
+    L_SH = 11
+    R_SH = 12
+
+    # Mid-shoulder anchor (normalized origin)
+    mid_sh_x = (lm[L_SH].x + lm[R_SH].x) / 2
+    mid_sh_y = (lm[L_SH].y + lm[R_SH].y) / 2
+    mid_sh_z = (lm[L_SH].z + lm[R_SH].z) / 2
 
     row = []
-    for i in range(len(lm)):
-        x = lm[i].x - hip_x
-        y = lm[i].y - hip_y
-        z = lm[i].z - hip_z
-        v = lm[i].visibility
-
+    for point in lm:
+        x = point.x - mid_sh_x
+        y = point.y - mid_sh_y
+        z = point.z - mid_sh_z
+        v = point.visibility
         row.extend([x, y, z, v])
 
-    return row
+    return row, res
 
 
 def create_landmark_dataframe():
