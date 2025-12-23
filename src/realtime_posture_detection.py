@@ -15,7 +15,7 @@ print("Camera opened:", cap.isOpened())
 
 def extract_landmarks_and_result(image):
     """
-    runs Mediapipe ONCE and returns flattened landmark row and result object
+    Runs Mediapipe ONCE and returns flattened landmark row and result object
     """
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     res = pose.process(rgb)
@@ -25,18 +25,18 @@ def extract_landmarks_and_result(image):
 
     lm = res.pose_landmarks.landmark
 
-    # normalize using hips
-    L_HIP, R_HIP = 23, 24
-    hip_x = (lm[L_HIP].x + lm[R_HIP].x) / 2
-    hip_y = (lm[L_HIP].y + lm[R_HIP].y) / 2
-    hip_z = (lm[L_HIP].z + lm[R_HIP].z) / 2
+    # normalize to mid-shoulder
+    L_SH, R_SH = 11, 12
+    mid_sh_x = (lm[L_SH].x + lm[R_SH].x) / 2
+    mid_sh_y = (lm[L_SH].y + lm[R_SH].y) / 2
+    mid_sh_z = (lm[L_SH].z + lm[R_SH].z) / 2
 
     row = []
     for point in lm:
         row.extend([
-            point.x - hip_x,
-            point.y - hip_y,
-            point.z - hip_z,
+            point.x - mid_sh_x,
+            point.y - mid_sh_y,
+            point.z - mid_sh_z,
             point.visibility
         ])
 
@@ -55,17 +55,26 @@ while True:
 
         # prediction
         pred_label = model.predict(X)[0]
-        pred_prob = model.predict_proba(X)[0].max()
+        pred_proba = model.predict_proba(X)[0]
+        
+        # debug info to see what model is thinking
+        good_prob = pred_proba[1]  # assuming 1 = good
+        bad_prob = pred_proba[0]   # assuming 0 = bad
 
-        if pred_label == "good":
-            label = f"GOOD POSTURE ({pred_prob:.2f})"
+        if pred_label == 1:  # good posture
+            label = f"GOOD POSTURE ({good_prob:.2f})"
             color = (0, 255, 0)
-        else:
-            label = f"BAD POSTURE ({pred_prob:.2f})"
+        else:  # bad posture
+            label = f"BAD POSTURE ({bad_prob:.2f})"
             color = (0, 0, 255)
 
         cv2.putText(frame, label, (30, 40),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 3)
+        
+        # show probability distribution for debugging
+        debug_text = f"Good: {good_prob:.2f} | Bad: {bad_prob:.2f}"
+        cv2.putText(frame, debug_text, (30, 80),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
     # draw skeleton
     if res.pose_landmarks:
